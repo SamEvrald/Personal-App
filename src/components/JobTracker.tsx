@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -137,11 +136,38 @@ const JobTracker = () => {
 
   const updateJobStatus = async (jobId: string, newStatus: JobApplication["status"]) => {
     try {
-      const response = await jobsApi.update(jobId, { status: newStatus });
+      // Find the job application to get its current full data
+      const jobToUpdate = jobs.find(job => job.id === jobId);
+
+      if (!jobToUpdate) {
+        toast({
+          title: "Error",
+          description: "Job application not found for update.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create a new object with all existing job data, and then override the status
+      const updatedJobData = {
+        companyName: jobToUpdate.companyName,
+        positionTitle: jobToUpdate.positionTitle,
+        applicationDate: jobToUpdate.applicationDate,
+        status: newStatus, // Only this field is changing
+        applicationUrl: jobToUpdate.applicationUrl || null, // Ensure optional fields are handled
+        salaryRange: (jobToUpdate as any).salaryRange || null, // Cast to any to access salaryRange if not in interface
+        location: jobToUpdate.location || null,
+        remoteOption: jobToUpdate.remoteOption,
+        notes: (jobToUpdate as any).notes || null, // Cast to any to access notes if not in interface
+        jobDescription: (jobToUpdate as any).jobDescription || null // Cast to any to access jobDescription if not in interface
+      };
+
+      const response = await jobsApi.update(jobId, updatedJobData); // Send the full data
       
       if (response.success) {
+        // Update the state with the response data (which should be the updated job)
         setJobs(jobs.map(job => 
-          job.id === jobId ? { ...job, status: newStatus } : job
+          job.id === jobId ? response.data : job
         ));
         
         toast({
@@ -151,7 +177,7 @@ const JobTracker = () => {
       } else {
         toast({
           title: "Error",
-          description: "Failed to update job status",
+          description: response.message || "Failed to update job status",
           variant: "destructive"
         });
       }

@@ -54,13 +54,33 @@ const Dashboard = () => {
   
 
   // Function to fetch all data
-  const fetchData = useCallback(async () => {
+   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       // Fetch Job Applications
       const jobsResponse = await jobsApi.getAll();
       if (jobsResponse.success) {
-        setJobApplications(jobsResponse.data.applications || []); // Adjust based on actual backend response structure
+        console.log("Raw jobsResponse.data.applications:", jobsResponse.data.applications); // DEBUG LOG 1
+
+        const fetchedJobApplications: JobApplication[] = (jobsResponse.data.applications || []).map((job: any) => {
+          // Ensure createdAt is a valid date string for parsing.
+          // If the backend returns 'YYYY-MM-DD HH:MM:SS' (MySQL DATETIME),
+          // it's better to replace space with 'T' for ISO format.
+          const createdAtString = job.createdAt ? job.createdAt.replace(' ', 'T') : new Date().toISOString();
+          const createdAtDate = new Date(createdAtString);
+          
+          // Fallback to current date if parsing results in Invalid Date
+          const validCreatedAt = createdAtDate.toString() !== 'Invalid Date' ? createdAtString : new Date().toISOString(); 
+
+          return {
+            id: job.id,
+            status: job.status,
+            platform: job.location || 'Unknown', // Map location to platform, provide fallback
+            createdAt: validCreatedAt
+          };
+        });
+        setJobApplications(fetchedJobApplications);
+        console.log("Mapped Job Applications (after setJobApplications):", fetchedJobApplications); // DEBUG LOG 2
       } else {
         toast({
           title: "Error",

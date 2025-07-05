@@ -32,11 +32,8 @@ const schemas = {
   project: Joi.object({
     name: Joi.string().required(),
     description: Joi.string().optional(),
-    // Change deadline to Joi.string() if sending ISO string, or keep Joi.date() if Joi handles Date objects well
-    // For consistency with how dates are sent to backend (e.g., dailyEntry), string is safer.
-    deadline: Joi.string().isoDate().optional().allow(null, ''), // Allow empty string or null for optional date
+    deadline: Joi.string().isoDate().optional().allow(null, ''),
     status: Joi.string().valid('active', 'completed', 'paused', 'cancelled').optional(),
-    // ADD THIS LINE: Allow subprojects as an array of strings
     subprojects: Joi.array().items(Joi.string()).optional()
   }),
   
@@ -60,26 +57,27 @@ const schemas = {
   
   weeklyReview: Joi.object({
     projectId: Joi.string().uuid().required(),
-    subprojectId: Joi.string().uuid().optional(),
+    subprojectId: Joi.string().uuid().optional().allow(null, ''),
     weekStartDate: Joi.date().required(),
-    whatShipped: Joi.string().required(),
-    whatFailedToDeliver: Joi.string().optional(),
-    whatDistracted: Joi.string().optional(),
-    whatLearned: Joi.string().required(),
+    whatShipped: Joi.string().optional().allow(''),
+    whatFailedToDeliver: Joi.string().optional().allow(''),
+    whatDistracted: Joi.string().optional().allow(''),
+    whatLearned: Joi.string().optional().allow(''),
     hoursSpent: Joi.number().positive().required()
   }),
   
   jobApplication: Joi.object({
     companyName: Joi.string().required(),
     positionTitle: Joi.string().required(),
-    jobDescription: Joi.string().optional(),
+    // --- ENSURE THESE HAVE .allow(null, '') ---
+    jobDescription: Joi.string().optional().allow(null, ''), 
     applicationDate: Joi.date().required(),
     status: Joi.string().valid('applied', 'screening', 'interview', 'offer', 'rejected', 'withdrawn').optional(),
-    applicationUrl: Joi.string().uri().optional(),
-    salaryRange: Joi.string().optional(),
-    location: Joi.string().optional(),
+    applicationUrl: Joi.string().uri().optional().allow(null, ''), 
+    salaryRange: Joi.string().optional().allow(null, ''), 
+    location: Joi.string().optional().allow(null, ''), 
     remoteOption: Joi.boolean().optional(),
-    notes: Joi.string().optional()
+    notes: Joi.string().optional().allow(null, '') 
   }),
   
   jobActivity: Joi.object({

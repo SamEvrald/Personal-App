@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import { weeklyApi, projectsApi } from "@/services/api";
 interface Project {
   id: string;
   name: string;
-  subprojects?: { id: string; name: string; }[];
+  subprojects?: { id: string; name: string; }[]; // This can be undefined from API
 }
 
 interface WeeklyReviewEntry {
@@ -24,15 +23,15 @@ interface WeeklyReviewEntry {
   whatFailedToDeliver: string;
   whatDistracted: string;
   whatLearned: string;
-  project: { name: string };
-  subproject?: { name: string };
-  hoursSpent: number;
-  createdAt: string;
+  project: { name: string }; // Assuming project object is included with name
+  subproject?: { name: string }; // Subproject might be optional with name
+  hoursSpent: number; // Ensure this is treated as a number
+  createdAt: string; // Ensure this is treated as a string that new Date() can parse
 }
 
 const WeeklyReview = () => {
   const [reviews, setReviews] = useState<WeeklyReviewEntry[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]); // Initialize as empty array
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [currentReview, setCurrentReview] = useState({
@@ -60,11 +59,30 @@ const WeeklyReview = () => {
       ]);
 
       if (reviewsResponse.success) {
-        setReviews(reviewsResponse.data.reviews);
+        // FIX 1: Ensure reviewsResponse.data.reviews is an array and parse hoursSpent
+        const fetchedReviews: WeeklyReviewEntry[] = (reviewsResponse.data.reviews || []).map((review: any) => ({
+          id: review.id,
+          weekStartDate: review.weekStartDate,
+          whatShipped: review.whatShipped,
+          whatFailedToDeliver: review.whatFailedToDeliver,
+          whatDistracted: review.whatDistracted,
+          whatLearned: review.whatLearned,
+          hoursSpent: parseFloat(review.hoursSpent) || 0, // Parse hoursSpent to number
+          project: review.project, // Assuming project object is included
+          subproject: review.subproject, // Assuming subproject object is included
+          createdAt: review.createdAt
+        }));
+        setReviews(fetchedReviews);
       }
 
       if (projectsResponse.success) {
-        setProjects(projectsResponse.data.projects);
+        // FIX 2: Ensure projectsResponse.data is an array and subprojects are arrays
+        const fetchedProjects: Project[] = (projectsResponse.data || []).map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          subprojects: p.subprojects ? p.subprojects.map((sp: any) => ({ id: sp.id, name: sp.name })) : [] // Ensure subprojects is an array
+        }));
+        setProjects(fetchedProjects);
       }
     } catch (error) {
       console.error('Fetch data error:', error);
@@ -122,7 +140,8 @@ const WeeklyReview = () => {
       const response = await weeklyApi.create(reviewData);
 
       if (response.success) {
-        setReviews([response.data, ...reviews]);
+        // FIX 3: Re-fetch all data after successful save to ensure consistency
+        fetchData(); 
         setCurrentReview({
           whatShipped: "",
           whatFailedToDeliver: "",
@@ -172,7 +191,24 @@ const WeeklyReview = () => {
   };
 
   const getSelectedProject = () => {
+    // FIX 4: Ensure projects is an array before using find
     return projects.find(p => p.id === currentReview.projectId);
+  };
+
+  // Helper functions for displaying project/subproject names in previous reviews
+  const getProjectNameById = (id: string) => {
+    const project = projects.find(p => p.id === id);
+    return project ? project.name : "Unknown Project";
+  };
+
+  const getSubprojectNameById = (projectId: string, subprojectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    // FIX 5: Safely access subprojects and then find
+    if (project && project.subprojects) {
+      const subproject = project.subprojects.find(sp => sp.id === subprojectId);
+      return subproject ? subproject.name : "Unknown Subproject";
+    }
+    return "Unknown Subproject";
   };
 
   if (loading) {
@@ -217,6 +253,7 @@ const WeeklyReview = () => {
                       <SelectValue placeholder="Select a project" />
                     </SelectTrigger>
                     <SelectContent>
+                      {/* FIX 6: Ensure projects is an array before mapping directly in JSX */}
                       {projects.map((project) => (
                         <SelectItem key={project.id} value={project.id}>
                           {project.name}
@@ -240,7 +277,8 @@ const WeeklyReview = () => {
                 </div>
               </div>
 
-              {getSelectedProject()?.subprojects && getSelectedProject()!.subprojects!.length > 0 && (
+              {/* FIX 7: Safely access subprojects with optional chaining and check length */}
+              {getSelectedProject()?.subprojects?.length > 0 && (
                 <div className="space-y-2">
                   <Label htmlFor="subproject">Subproject (optional)</Label>
                   <Select 
@@ -251,6 +289,7 @@ const WeeklyReview = () => {
                       <SelectValue placeholder="Select a subproject (optional)" />
                     </SelectTrigger>
                     <SelectContent>
+                      {/* FIX 8: Safely map over subprojects */}
                       {getSelectedProject()!.subprojects!.map((subproject) => (
                         <SelectItem key={subproject.id} value={subproject.id}>
                           {subproject.name}
@@ -342,16 +381,23 @@ const WeeklyReview = () => {
                         Week of {formatWeekRange(review.weekStartDate)}
                       </Badge>
                       <Badge variant="secondary">
-                        {review.project.name} - {review.hoursSpent}h
+                        {/* FIX 9: Safely access project name and format hours */}
+                        {review.project?.name || "Unknown Project"} - {review.hoursSpent.toFixed(2)}h
                       </Badge>
                       {review.subproject && (
                         <Badge variant="outline" className="text-xs">
-                          {review.subproject.name}
+                          {/* FIX 10: Safely access subproject name */}
+                          {review.subproject.name || "Unknown Subproject"}
                         </Badge>
                       )}
                     </div>
                     <span className="text-sm text-gray-500">
-                      {new Date(review.createdAt).toLocaleDateString()}
+                      {/* FIX 11: Robust date formatting for createdAt */}
+                      Reviewed: {
+                        review.createdAt && (new Date(review.createdAt).toString() !== 'Invalid Date')
+                          ? new Date(review.createdAt).toLocaleDateString()
+                          : 'N/A' // Fallback if createdAt is invalid or null/undefined
+                      }
                     </span>
                   </div>
                   
