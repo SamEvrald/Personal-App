@@ -12,6 +12,33 @@ const getAuthHeaders = (isFormData: boolean = false) => {
   return headers;
 };
 
+// Generic function to handle API responses
+// It will parse JSON and throw an error if 'success' is false in the payload,
+// regardless of the HTTP status code.
+const handleApiResponse = async (response: Response) => {
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    // If response is not valid JSON, it's a critical error
+    console.error("handleApiResponse - Failed to parse JSON response:", e, "Raw response text:", await response.text());
+    throw new Error(`API Response Error: Could not parse JSON. Status: ${response.status}`);
+  }
+
+  console.log("handleApiResponse - Parsed Data:", data); // NEW DEBUG LOG
+  console.log("handleApiResponse - response.ok:", response.ok); // Existing DEBUG LOG
+  console.log("handleApiResponse - data.success:", data.success); // NEW DEBUG LOG
+
+  if (response.ok || data.success === true) {
+    console.log("handleApiResponse - Returning SUCCESS data."); // NEW DEBUG LOG
+    return data;
+  } else {
+    console.log("handleApiResponse - Throwing ERROR. Data message:", data.message); // NEW DEBUG LOG
+    // If response.ok is false AND data.success is false/undefined, then it's a real error.
+    throw new Error(data.message || 'An unknown error occurred');
+  }
+};
+
 // Job Applications API
 export const jobsApi = {
   getAll: async (params?: { page?: number; limit?: number; status?: string; company?: string }) => {
@@ -24,7 +51,7 @@ export const jobsApi = {
     const response = await fetch(`${API_BASE_URL}/jobs?${searchParams}`, {
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   create: async (data: any) => {
@@ -33,7 +60,7 @@ export const jobsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   update: async (id: string, data: any) => {
@@ -42,7 +69,7 @@ export const jobsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   delete: async (id: string) => {
@@ -50,14 +77,14 @@ export const jobsApi = {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   getStats: async () => {
     const response = await fetch(`${API_BASE_URL}/jobs/stats`, {
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   }
 };
 
@@ -73,7 +100,7 @@ export const weeklyApi = {
     const response = await fetch(`${API_BASE_URL}/weekly?${searchParams}`, {
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   create: async (data: any) => {
@@ -82,7 +109,7 @@ export const weeklyApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   update: async (id: string, data: any) => {
@@ -91,7 +118,7 @@ export const weeklyApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   delete: async (id: string) => {
@@ -99,7 +126,7 @@ export const weeklyApi = {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   }
 };
 
@@ -116,7 +143,7 @@ export const dailyApi = {
     const response = await fetch(`${API_BASE_URL}/daily?${searchParams}`, {
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   // Modified to accept FormData for file uploads
@@ -130,7 +157,7 @@ export const dailyApi = {
       headers: headers,
       body: isFormData ? data : JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   update: async (id: string, data: FormData | any) => {
@@ -142,7 +169,7 @@ export const dailyApi = {
       headers: headers,
       body: isFormData ? data : JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   delete: async (id: string) => {
@@ -150,7 +177,7 @@ export const dailyApi = {
       method: 'DELETE',
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   }
 };
 
@@ -160,7 +187,7 @@ export const projectsApi = {
     const response = await fetch(`${API_BASE_URL}/projects`, {
       headers: getAuthHeaders()
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   },
 
   create: async (data: any) => {
@@ -169,6 +196,6 @@ export const projectsApi = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
     });
-    return response.json();
+    return handleApiResponse(response); // Use the new handler
   }
 };

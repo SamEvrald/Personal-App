@@ -51,7 +51,12 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  
+   // Helper function to normalize dates to the start of the day (midnight UTC)
+  const normalizeDateToMidnight = (date: Date) => {
+    const d = new Date(date);
+    d.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+    return d;
+  };
 
   // Function to fetch all data
    const fetchData = useCallback(async () => {
@@ -166,13 +171,18 @@ setProjects(fetchedProjects);
     return () => clearInterval(interval);
   }, [projects, toast]); // Add projects to dependency array
 
-  const analytics = useMemo(() => {
+ const analytics = useMemo(() => {
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfWeek = new Date(now.getTime() - (now.getDay() * 24 * 60 * 60 * 1000));
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // Normalize current date to midnight for consistent comparison
+    const startOfToday = normalizeDateToMidnight(now);
+    // Calculate start of week (Sunday)
+    // Create a new Date object to avoid modifying 'now' directly
+    const startOfWeekDate = new Date(now); 
+    const startOfWeek = normalizeDateToMidnight(new Date(startOfWeekDate.setDate(startOfWeekDate.getDate() - startOfWeekDate.getDay())));
+    // Calculate start of month
+    const startOfMonth = normalizeDateToMidnight(new Date(now.getFullYear(), now.getMonth(), 1));
 
-    const filterItemsByTimeframe = <T extends { createdAt?: string | Date; entryDate?: string | Date }>(
+    const filterItemsByTimeframe = <T extends { id: string; createdAt?: string | Date; entryDate?: string | Date }>(
       items: T[], 
       timeframe: string, 
       dateKey: 'createdAt' | 'entryDate'
@@ -180,7 +190,7 @@ setProjects(fetchedProjects);
       let startDate: Date;
       switch (timeframe) {
         case "daily":
-          startDate = startOfDay;
+          startDate = startOfToday;
           break;
         case "weekly":
           startDate = startOfWeek;
@@ -193,7 +203,13 @@ setProjects(fetchedProjects);
       }
       return items.filter(item => {
         const itemDate = new Date(item[dateKey] as string);
-        return itemDate >= startDate;
+        // Ensure itemDate is valid and normalized to midnight for accurate comparison
+        const normalizedItemDate = normalizeDateToMidnight(itemDate);
+        const isValidDate = itemDate.toString() !== 'Invalid Date';
+        const isAfterStartDate = normalizedItemDate >= startDate; // Compare normalized dates
+        
+        console.log(`Filtering: Item ID: ${item.id}, Item Date (Original): ${itemDate.toISOString()}, Item Date (Normalized): ${normalizedItemDate.toISOString()}, Start Date: ${startDate.toISOString()}, Valid: ${isValidDate}, Keep: ${isValidDate && isAfterStartDate}`); // DEBUG LOG 5
+        return isValidDate && isAfterStartDate; 
       });
     };
 
@@ -225,15 +241,16 @@ setProjects(fetchedProjects);
     }));
 
     // Daily trend for the past 7 days (based on job applications)
-    const dailyTrend = [];
+   const dailyTrend = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
-      const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
-      
+      const dayStart = normalizeDateToMidnight(date);
+      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000); // End of day for filtering
+
       const dayJobs = jobApplications.filter(job => {
         const jobCreatedAt = new Date(job.createdAt);
-        return jobCreatedAt >= dayStart && jobCreatedAt < dayEnd;
+        const normalizedJobCreatedAt = normalizeDateToMidnight(jobCreatedAt);
+        return normalizedJobCreatedAt >= dayStart && normalizedJobCreatedAt < dayEnd && jobCreatedAt.toString() !== 'Invalid Date'; // Ensure valid date
       });
 
       dailyTrend.push({

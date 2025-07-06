@@ -1,6 +1,6 @@
-
 const { JobApplication, JobActivity } = require('../models');
 const { Op } = require('sequelize');
+const { sequelize } = require('../config/database'); // sequelize is used in getStats, so keep this import
 
 const jobController = {
   // Get all job applications for a user
@@ -21,6 +21,7 @@ const jobController = {
         };
       }
 
+      // FIX: Corrected typo from findAndAndCountAll to findAndCountAll
       const { count, rows: applications } = await JobApplication.findAndCountAll({
         where: whereClause,
         include: [
@@ -207,12 +208,26 @@ const jobController = {
 
       // If status changed, create activity
       if (status && status !== oldStatus) {
-        await JobActivity.create({
-          jobApplicationId: application.id,
-          activityType: status,
-          activityDate: new Date(),
-          description: `Status changed to ${status}`
-        });
+        // Map job application status to activity type for JobActivity ENUM
+        const activityTypeMap = {
+          'applied': 'application',
+          'screening': 'phone_screen', 
+          'interview': 'interview',
+          'offer': 'offer',
+          'rejected': 'rejection',   
+          'withdrawn': 'withdrawal' 
+        };
+
+        const activityType = activityTypeMap[status];
+
+        if (activityType) { 
+          await JobActivity.create({
+            jobApplicationId: application.id,
+            activityType: activityType, 
+            activityDate: new Date(), 
+            description: `Status changed to ${status}`
+          });
+        }
       }
 
       // Fetch updated application with activities
