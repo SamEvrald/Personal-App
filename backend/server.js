@@ -1,6 +1,11 @@
 
 const app = require('./src/app');
 const { sequelize } = require('./src/config/database');
+const cors = require('cors'); 
+
+app.use(cors()); // For now, allow all origins for initial testing, then restrict
+
+app.use(express.json()); 
 
 const PORT = process.env.PORT || 5000;
 
