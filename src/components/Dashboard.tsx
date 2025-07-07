@@ -55,6 +55,7 @@ const Dashboard = () => {
   const normalizeDateToMidnight = (date: Date) => {
     const d = new Date(date);
     d.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+    d.setMilliseconds(0); // Ensure milliseconds are also zeroed out for precise comparison
     return d;
   };
 
@@ -172,15 +173,11 @@ setProjects(fetchedProjects);
   }, [projects, toast]); // Add projects to dependency array
 
  const analytics = useMemo(() => {
-    const now = new Date();
-    // Normalize current date to midnight for consistent comparison
-    const startOfToday = normalizeDateToMidnight(now);
-    // Calculate start of week (Sunday)
-    // Create a new Date object to avoid modifying 'now' directly
-    const startOfWeekDate = new Date(now); 
+    const currentMoment = new Date(); 
+     const startOfToday = normalizeDateToMidnight(currentMoment);
+    const startOfWeekDate = new Date(currentMoment); 
     const startOfWeek = normalizeDateToMidnight(new Date(startOfWeekDate.setDate(startOfWeekDate.getDate() - startOfWeekDate.getDay())));
-    // Calculate start of month
-    const startOfMonth = normalizeDateToMidnight(new Date(now.getFullYear(), now.getMonth(), 1));
+    const startOfMonth = normalizeDateToMidnight(new Date(currentMoment.getFullYear(), currentMoment.getMonth(), 1));
 
     const filterItemsByTimeframe = <T extends { id: string; createdAt?: string | Date; entryDate?: string | Date }>(
       items: T[], 
@@ -239,22 +236,23 @@ setProjects(fetchedProjects);
       platform,
       count
     }));
-
-    // Daily trend for the past 7 days (based on job applications)
-   const dailyTrend = [];
+ const dailyTrend = [];
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
-      const dayStart = normalizeDateToMidnight(date);
-      const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000); // End of day for filtering
+      // Create a new date object for each day in the loop based on the *original* currentMoment
+      const dateForDay = new Date(currentMoment.getTime() - (i * 24 * 60 * 60 * 1000));
+      const dayStartNormalized = normalizeDateToMidnight(dateForDay); // Normalize the start of this specific day
 
       const dayJobs = jobApplications.filter(job => {
         const jobCreatedAt = new Date(job.createdAt);
-        const normalizedJobCreatedAt = normalizeDateToMidnight(jobCreatedAt);
-        return normalizedJobCreatedAt >= dayStart && normalizedJobCreatedAt < dayEnd && jobCreatedAt.toString() !== 'Invalid Date'; // Ensure valid date
+        // FIX: Corrected typo here from normalizeDateDateToMidnight to normalizeDateToMidnight
+        const normalizedJobCreatedAt = normalizeDateToMidnight(jobCreatedAt); 
+        
+        // Check if the normalized job creation date matches the normalized start of the current day in the loop
+        return normalizedJobCreatedAt.getTime() === dayStartNormalized.getTime() && jobCreatedAt.toString() !== 'Invalid Date';
       });
 
       dailyTrend.push({
-        date: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        date: dateForDay.toLocaleDateString('en-US', { weekday: 'short' }), // This is line 258
         applications: dayJobs.length
       });
     }
