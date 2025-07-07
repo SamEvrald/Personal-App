@@ -21,6 +21,17 @@ const sequelize = new Sequelize({
     underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
+  },
+
+  dialectOptions: {
+    ssl: {
+      // This is often required for cloud MySQL databases.
+      // Setting rejectUnauthorized to false allows connections even if
+      // the server's SSL certificate isn't directly trusted by the client's CA bundle.
+      // In a production environment, ideally you'd configure your server
+      // to trust the specific CA, but for ease of deployment, this is common.
+      rejectUnauthorized: false
+    }
   }
 });
 
