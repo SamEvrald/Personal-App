@@ -1,9 +1,9 @@
 
 # Apply & Achieve - Job Application Tracker
 
-A comprehensive job application tracking and productivity management system designed to help job seekers stay organized, track their progress, and achieve their career goals.
+A comprehensive job application tracking and productivity management system designed to help job seekers (in the phase of development it was myself) stay organized, track their progress, and achieve their career goals.
 
-## 🚀 Features
+## Features
 
 ### Core Functionality
 - **Job Application Tracking**: Track job applications across multiple platforms (Upwork, Toptal, LinkedIn, etc.)
@@ -13,8 +13,7 @@ A comprehensive job application tracking and productivity management system desi
 - **Analytics Dashboard**: Visual insights into application patterns and success rates
 
 ### User Experience
-- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Native Mobile Apps**: iOS and Android apps using Capacitor
+- **Responsive Design**: Optimized Web app.
 - **Real-time Updates**: Instant synchronization across all devices
 - **Intuitive Interface**: Clean, modern UI built with shadcn/ui components
 
@@ -23,7 +22,7 @@ A comprehensive job application tracking and productivity management system desi
 - **Protected Routes**: User data is secured and accessible only after authentication
 - **Personal Data Management**: Each user's data is completely isolated
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 ### Frontend Stack
 - **React 18**: Modern React with hooks for component state management
@@ -36,58 +35,15 @@ A comprehensive job application tracking and productivity management system desi
 - **TanStack Query**: Data fetching, caching, and synchronization
 - **Recharts**: Responsive charts for data visualization
 
-### Mobile Development
-- **Capacitor**: Cross-platform native runtime for iOS and Android
-- **Progressive Web App**: Works offline and can be installed on devices
-
 ### Backend Architecture
 - **Node.js**: JavaScript runtime for server-side development
 - **Express.js**: Web application framework
 - **Sequelize ORM**: Database abstraction layer
-- **PostgreSQL**: Robust relational database
+- **MySQL**: Robust relational database
 - **JWT Authentication**: Secure token-based authentication
 - **RESTful API**: Clean, predictable API endpoints
 
-## 🏗️ Architecture Overview
-
-### Frontend Architecture
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # shadcn/ui components
-│   ├── JobTracker.tsx  # Job application management
-│   ├── Dashboard.tsx   # Analytics and overview
-│   ├── WeeklyReview.tsx# Weekly reflection component
-│   └── DailyExecution.tsx # Daily task management
-├── contexts/           # React Context providers
-│   └── AuthContext.tsx # Authentication state management
-├── pages/              # Route components
-│   ├── Index.tsx       # Main application dashboard
-│   ├── Login.tsx       # User authentication
-│   └── Register.tsx    # User registration
-└── hooks/              # Custom React hooks
-```
-
-### Backend Architecture
-```
-backend/
-├── src/
-│   ├── controllers/    # Request handlers
-│   │   ├── authController.js
-│   │   ├── jobController.js
-│   │   ├── weeklyController.js
-│   │   └── dailyController.js
-│   ├── models/         # Database models
-│   │   ├── User.js
-│   │   ├── JobApplication.js
-│   │   ├── WeeklyReview.js
-│   │   └── DailyEntry.js
-│   ├── routes/         # API endpoints
-│   ├── middleware/     # Authentication & validation
-│   └── config/         # Database configuration
-```
-
-## 🎯 Why These Technologies?
+## Why These Technologies?
 
 ### React + TypeScript
 - **Developer Experience**: Excellent tooling, debugging, and IntelliSense
@@ -101,31 +57,33 @@ backend/
 - **Accessibility**: shadcn/ui components are accessible by default
 - **Customization**: Easy to customize while maintaining best practices
 
-### Capacitor for Mobile
-- **Code Reuse**: Single codebase for web, iOS, and Android
-- **Native Performance**: Access to native device features when needed
-- **Web Standards**: Uses standard web technologies, no proprietary syntax
-- **Easy Deployment**: Simple build process for app stores
-
-### PostgreSQL + Sequelize
+### MySQL + Sequelize
 - **Data Integrity**: ACID compliance and robust data relationships
 - **Scalability**: Handles growing datasets efficiently
 - **ORM Benefits**: Type-safe database queries and migrations
 - **JSON Support**: Flexible data storage when needed
 
-## 📱 Mobile App Features
+## Demo
+![Register](https://github.com/user-attachments/assets/76b701b5-9721-44f7-84c6-08d72a0905c8)
+![Login](https://github.com/user-attachments/assets/df48be08-2c3c-4926-92d6-48dd49f8cd9e)
+![Initial Dashboard 1](https://github.com/user-attachments/assets/ccb72b36-4b80-4108-a2c7-8300d6b1da3e)
+![Initial Dashboard 2](https://github.com/user-attachments/assets/3714bff5-868d-4e8b-a3b2-7eb3dc455054)
+![Initial Dashboard 3](https://github.com/user-attachments/assets/d4de6382-505a-49d4-adcf-70320aacb214)
+![Add Project](https://github.com/user-attachments/assets/87c980e4-4bac-4362-b8e4-46ab88ad1fd3)
+![Daily Execution](https://github.com/user-attachments/assets/945588af-5bd1-48a6-997c-523654bbacd1)
+![Add job](https://github.com/user-attachments/assets/b78fe462-8537-4ed8-b393-5965e33d58ea)
+![Job Track](https://github.com/user-attachments/assets/461a7d07-41d4-4fee-8f9c-1fd34d3271e3)
+![Weeky Review](https://github.com/user-attachments/assets/71cd96cb-660b-46d6-be75-5e8c62c8d26b)
+![Weeky Review 2](https://github.com/user-attachments/assets/be1c2167-293b-47c6-85a9-a7add77aa9df)
+![Final Dashboard](https://github.com/user-attachments/assets/674e6d2c-b477-420a-8dc4-6972edb60d33)
+![Final Dashboard 1](https://github.com/user-attachments/assets/2f02233f-a1f4-45ef-a54c-42b9d4531aef)
+![Final Dashboard 2](https://github.com/user-attachments/assets/385ac250-d8de-4909-ae03-214266156f21)
 
-The mobile version includes all web features plus:
-- **Native Look & Feel**: Platform-specific UI adaptations
-- **Offline Capability**: Core functionality works without internet
-- **Push Notifications**: Stay updated on application status (future feature)
-- **Camera Integration**: Upload documents directly from device (future feature)
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v16 or higher)
-- PostgreSQL database
+- MySQL database
 - Git
 
 ### Installation
@@ -133,7 +91,7 @@ The mobile version includes all web features plus:
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd apply-and-achieve-app
+   cd projectpath
    ```
 
 2. **Install dependencies**
@@ -143,7 +101,7 @@ The mobile version includes all web features plus:
 
 3. **Set up the database**
    ```bash
-   # Create PostgreSQL database
+   # Create MySQL database
    createdb job_tracker_db
    
    # Run migrations
@@ -165,29 +123,11 @@ The mobile version includes all web features plus:
    npm run dev
    
    # Terminal 2: Start frontend
+   cd src
    npm run dev
    ```
 
-### Mobile Development
-
-1. **Build the web app**
-   ```bash
-   npm run build
-   ```
-
-2. **Add mobile platforms**
-   ```bash
-   npx cap add ios
-   npx cap add android
-   ```
-
-3. **Sync and run**
-   ```bash
-   npx cap sync
-   npx cap run ios    # or android
-   ```
-
-## 📊 Database Schema
+## Database Schema
 
 ### Core Tables
 - **Users**: User authentication and profile information
@@ -201,7 +141,7 @@ The mobile version includes all web features plus:
 - JobApplications can be linked to Projects for better organization
 - WeeklyReviews track progress on specific Projects
 
-## 🔒 Security Features
+## Security Features
 
 - **JWT Authentication**: Secure, stateless authentication
 - **Password Hashing**: bcrypt for secure password storage
@@ -209,13 +149,12 @@ The mobile version includes all web features plus:
 - **SQL Injection Protection**: Parameterized queries via Sequelize
 - **CORS Configuration**: Proper cross-origin resource sharing setup
 
-## 🎨 Design Philosophy
+## Design Philosophy
 
 ### User-Centric Design
 - **Minimal Cognitive Load**: Clean, uncluttered interface
 - **Progressive Disclosure**: Show relevant information when needed
 - **Consistent Patterns**: Familiar UI patterns throughout the app
-- **Mobile-First**: Responsive design that works on all devices
 
 ### Performance Optimization
 - **Code Splitting**: Lazy loading for optimal bundle sizes
@@ -223,22 +162,14 @@ The mobile version includes all web features plus:
 - **Database Indexing**: Optimized queries for fast data retrieval
 - **Caching Strategy**: Smart caching for frequently accessed data
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Planned Features
 - **Email Notifications**: Automated reminders and updates
-- **Advanced Analytics**: Deeper insights into application success patterns
-- **Team Collaboration**: Share progress with mentors or career coaches
-- **Integration APIs**: Connect with job boards and applicant tracking systems
-- **AI Recommendations**: Smart suggestions based on application history
+- **Mobile App Development**: Develop a mobile version of the app for improved user experience
 
-### Technical Improvements
-- **Real-time Updates**: WebSocket integration for live data
-- **Offline Sync**: Complete offline functionality with sync
-- **Performance Monitoring**: Application performance tracking
-- **Automated Testing**: Comprehensive test suite for reliability
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our contributing guidelines for details on how to:
 - Report bugs
@@ -246,17 +177,11 @@ We welcome contributions! Please see our contributing guidelines for details on 
 - Submit pull requests
 - Follow coding standards
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
+## Author
 
-- **shadcn/ui** for the beautiful component library
-- **Tailwind CSS** for the utility-first CSS framework
-- **Capacitor** for enabling cross-platform mobile development
-- **The React Community** for continuous innovation and support
-
----
-
-**Apply & Achieve** - Turning job applications into career achievements, one application at a time.
+**Muyango Sam Evrald**
+Software Developer
