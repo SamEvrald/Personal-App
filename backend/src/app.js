@@ -17,6 +17,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000', // Your local frontend dev server
   'http://localhost:5173', // Common Vite dev server port
+  'http://localhost:8081',
   'https://personal-app-fronten.vercel.app', // <-- REMOVED TRAILING SLASH HERE. REPLACE WITH YOUR ACTUAL VERCEL URL
   // Add any other domains your frontend might be hosted on
 ];
