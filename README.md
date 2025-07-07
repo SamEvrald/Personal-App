@@ -1,5 +1,5 @@
 
-# Apply & Achieve - Job Application Tracker
+# Personal Productivity and Job Application Tracker
 
 A comprehensive job application tracking and productivity management system designed to help job seekers (in the phase of development it was myself) stay organized, track their progress, and achieve their career goals.
 
