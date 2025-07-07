@@ -14,6 +14,31 @@ const jobRoutes = require('./routes/jobs');
 
 const app = express();
 
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:3000', // Your local frontend dev server
+  'http://localhost:5173', // Common Vite dev server port
+  'https://personal-app-fronten.vercel.app/', // <-- REPLACE WITH YOUR ACTUAL VERCEL URL
+  // Add any other domains your frontend might be hosted on
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      callback(new Error(msg), false);
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
 // Security middleware
 app.use(helmet());
 
