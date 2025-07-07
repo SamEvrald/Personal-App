@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -18,26 +17,30 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000', // Your local frontend dev server
   'http://localhost:5173', // Common Vite dev server port
-  'https://personal-app-fronten.vercel.app/', // <-- REPLACE WITH YOUR ACTUAL VERCEL URL
+  'https://personal-app-fronten.vercel.app', // <-- REMOVED TRAILING SLASH HERE. REPLACE WITH YOUR ACTUAL VERCEL URL
   // Add any other domains your frontend might be hosted on
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    // or if the origin is in our allowed list.
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      // Deny access if the origin is not allowed
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
       callback(new Error(msg), false);
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 200
+  credentials: true, // Allow cookies/authorization headers to be sent
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Explicitly allow headers
+  optionsSuccessStatus: 200 // For preflight requests
 };
 
-app.use(cors(corsOptions));
+// CORS configuration - ONLY ONE INSTANCE HERE
+app.use(cors(corsOptions)); // <-- THIS IS THE ONLY CORS MIDDLEWARE WE NEED
 
 // Security middleware
 app.use(helmet());
@@ -50,11 +53,11 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+// The duplicate CORS configuration has been removed from here.
+// app.use(cors({
+//   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+//   credentials: true
+// }));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
