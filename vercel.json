@@ -1,17 +1,10 @@
     {
-      "build": {
-        "env": {
-          "VITE_API_URL": "https://personal-app-backend-68iz.onrender.com/api"
-        }
-      },
-      "projects": [
-        {
-          "name": "personal-app-frontend",
-          "root": "src",
-          "buildCommand": "npm run build",
-          "outputDirectory": "dist",
-          "framework": "vite"
-        }
-      ]
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist",
+      "installCommand": "npm install",
+      "framework": "vite",
+      "env": {
+        "VITE_API_URL": "https://personal-app-backend-68iz.onrender.com/api"
+      }
     }
     
